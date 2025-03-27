@@ -15,13 +15,13 @@ function centerText(text, color = "blueBright") {
   return " ".repeat(padding) + chalk[color](text);
 }
 
-cfonts.say('NT Exhaust', {
+cfonts.say('LocalSec', {
   font: 'block',
   align: 'center',
   colors: ['cyan', 'black'],
 });
-console.log(centerText("=== Telegram Channel 🚀 : NT Exhaust ( @NTExhaust ) ===\n", "blueBright"));
-console.log(chalk.yellow('============ Auto Registration Bot ===========\n'));
+console.log(centerText("=== Telegram Channel 🚀 : LocalSec ===\n", "blueBright"));
+console.log(chalk.yellow('============ Bot Tự Đăng Ký Tài Khoản ===========\n'));
 
 function generateRandomHeaders() {
   const userAgents = [
@@ -45,7 +45,7 @@ function delay(ms) {
 async function countdown(ms) {
   const seconds = Math.floor(ms / 1000);
   for (let i = seconds; i > 0; i--) {
-    process.stdout.write(chalk.grey(`\rMenunggu ${i} detik... `));
+    process.stdout.write(chalk.grey(`\rĐang chờ ${i} detik... `));
     await delay(1000);
   }
   process.stdout.write('\r' + ' '.repeat(50) + '\r');
@@ -56,7 +56,7 @@ async function main() {
     {
       type: 'confirm',
       name: 'useProxy',
-      message: 'Apakah Anda ingin menggunakan proxy?',
+      message: 'Bạn có muốn sử dụng proxy không??',
       default: false,
     }
   ]);
@@ -68,7 +68,7 @@ async function main() {
       {
         type: 'list',
         name: 'proxyType',
-        message: 'Pilih jenis proxy:',
+        message: 'Chọn loại proxy:',
         choices: ['Rotating', 'Static'],
       }
     ]);
@@ -76,9 +76,9 @@ async function main() {
     try {
       const proxyData = fs.readFileSync('proxy.txt', 'utf8');
       proxyList = proxyData.split('\n').map(line => line.trim()).filter(Boolean);
-      console.log(chalk.blueBright(`Terdapat ${proxyList.length} proxy.\n`));
+      console.log(chalk.blueBright(`Có ${proxyList.length} proxy.\n`));
     } catch (err) {
-      console.log(chalk.yellow('File proxy.txt tidak ditemukan, tidak menggunakan proxy.\n'));
+      console.log(chalk.yellow('Không tìm thấy tệp proxy.txt, không sử dụng proxy.\n'));
     }
   }
 
@@ -88,11 +88,11 @@ async function main() {
       {
         type: 'input',
         name: 'count',
-        message: 'Input Jumlah Refferal Yang Diinginkan: ',
+        message: 'Nhập số lượng Ref mong muốn: ',
         validate: (value) => {
           const parsed = parseInt(value, 10);
           if (isNaN(parsed) || parsed <= 0) {
-            return 'Harap masukkan angka yang valid lebih dari 0!';
+            return 'Vui lòng nhập số hợp lệ lớn hơn 0!';
           }
           return true;
         }
@@ -106,14 +106,14 @@ async function main() {
     {
       type: 'input',
       name: 'ref',
-      message: 'Masukkan kode reff: ',
+      message: 'Nhập mã giới thiệu: ',
     }
   ]);
 
   console.log(chalk.yellow('\n==================================='));
-  console.log(chalk.yellowBright(`Creating ${count} Akun ..`));
-  console.log(chalk.yellowBright('Note: Jangan Bar Barbar Bang 🗿'));
-  console.log(chalk.yellowBright('Saran: Kalau Mau BarBar, gunakan Proxy..'));
+  console.log(chalk.yellowBright(`Đang ${count} tài khoản ..`));
+  console.log(chalk.yellowBright('Note: Bình tĩnh anh bạn. 🗿'));
+  console.log(chalk.yellowBright('Gợi ý: Nếu bạn muốn chơi lớn, hãy sử dụng proxy..'));
   console.log(chalk.yellow('=====================================\n'));
 
   const fileName = 'accounts.json';
@@ -145,11 +145,11 @@ async function main() {
       } else {
         selectedProxy = proxyList.shift();
         if (!selectedProxy) {
-          console.error(chalk.red("Tidak ada proxy yang tersisa untuk mode static."));
+          console.error(chalk.red("Không còn proxy nào cho chế độ tĩnh."));
           process.exit(1);
         }
       }
-      console.log("Menggunakan proxy: ", selectedProxy);
+      console.log("Sử dụng proxy: ", selectedProxy);
       const agent = new HttpsProxyAgent(selectedProxy);
       accountAxiosConfig.httpAgent = agent;
       accountAxiosConfig.httpsAgent = agent;
@@ -160,24 +160,24 @@ async function main() {
       const ipResponse = await axios.get('https://api.ipify.org?format=json', accountAxiosConfig);
       accountIP = ipResponse.data.ip;
     } catch (error) {
-      accountIP = "Gagal mendapatkan IP";
-      console.error("Error saat mendapatkan IP:", error.message);
+      accountIP = "Không nhận được IP";
+      console.error("Lỗi khi nhận IP:", error.message);
     }
-    console.log(chalk.white(`IP Yang Digunakan: ${accountIP}\n`));
+    console.log(chalk.white(`IP đã sử dụng: ${accountIP}\n`));
 
     const wallet = ethers.Wallet.createRandom();
     const walletAddress = wallet.address;
-    console.log(chalk.greenBright(`✔️  Wallet Ethereum berhasil dibuat: ${walletAddress}`));
+    console.log(chalk.greenBright(`✔️  Ví Ethereum đã được tạo thành công: ${walletAddress}`));
 
     const payload = {
       wallet: walletAddress,
       invite: ref
     };
 
-    const regSpinner = ora('Mengirim data ke API...').start();
+    const regSpinner = ora('Gửi dữ liệu đến API...').start();
     try {
       await axios.post('https://mscore.onrender.com/user', payload, accountAxiosConfig);
-      regSpinner.succeed(chalk.greenBright('  Berhasil mendaftarkan akun'));
+      regSpinner.succeed(chalk.greenBright('  Tài khoản đã đăng ký thành công'));
       successCount++;
 
       accounts.push({
@@ -186,15 +186,15 @@ async function main() {
       });
       try {
         fs.writeFileSync(fileName, JSON.stringify(accounts, null, 2));
-        console.log(chalk.greenBright('✔️  Data akun berhasil disimpan ke accounts.json'));
+        console.log(chalk.greenBright('✔️  Dữ liệu tài khoản đã được lưu thành công vào accounts.json'));
       } catch (err) {
-        console.error(chalk.red(`✖   Gagal menyimpan data ke ${fileName}: ${err.message}`));
+        console.error(chalk.red(`✖   Không lưu được dữ liệu vào ${fileName}: ${err.message}`));
       }
     } catch (error) {
-      regSpinner.fail(chalk.red(`✖   Gagal untuk ${walletAddress} : ${error.message}`));
+      regSpinner.fail(chalk.red(`✖   Không thành công ${walletAddress} : ${error.message}`));
       failCount++;
     }
-    console.log(chalk.yellow(`\nProgress: ${i + 1}/${count} akun telah diregistrasi. (Berhasil: ${successCount}, Gagal: ${failCount})`));
+    console.log(chalk.yellow(`\nProgress: ${i + 1}/${count} tài khoản đã được đăng ký. (Thành công: ${successCount}, Thất bại: ${failCount})`));
     console.log(chalk.cyanBright('====================================================================\n'));
 
     if (i < count - 1) {
@@ -202,7 +202,7 @@ async function main() {
       await countdown(randomDelay);
     }
   }
-  console.log(chalk.blueBright('\nRegistrasi selesai.'));
+  console.log(chalk.blueBright('\nĐăng ký hoàn tất.'));
 }
 
 main();

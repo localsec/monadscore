@@ -57,7 +57,7 @@ function newAgent(proxy) {
   } else if (proxy.startsWith('socks4://') || proxy.startsWith('socks5://')) {
     return new SocksProxyAgent(proxy);
   } else {
-    console.log(chalk.red(`Unsupported proxy type: ${proxy}`));
+    console.log(chalk.red(`Loại proxy không được hỗ trợ: ${proxy}`));
     return null;
   }
 }
@@ -93,7 +93,7 @@ async function readAccounts() {
     const data = await fs.readFile('accounts.json', 'utf-8');
     return JSON.parse(data);
   } catch (error) {
-    console.error(chalk.red(`Error reading accounts.json: ${error.message}`));
+    console.error(chalk.red(`Lỗi đọc accounts.json: ${error.message}`));
     return [];
   }
 }
@@ -106,7 +106,7 @@ async function readProxies() {
       .map(line => line.trim())
       .filter(line => line.length > 0);
   } catch (error) {
-    console.error(chalk.red(`Error reading proxy.txt: ${error.message}`));
+    console.error(chalk.red(`Lỗi đọc proxy.txt: ${error.message}`));
     return [];
   }
 }
@@ -117,10 +117,10 @@ async function getPublicIP(proxy) {
     if (response && response.data && response.data.ip) {
       return response.data.ip;
     } else {
-      return 'IP tidak ditemukan';
+      return 'Không tìm thấy IP';
     }
   } catch (error) {
-    return 'Error mengambil IP';
+    return 'Lỗi khi truy xuất IP';
   }
 }
 
@@ -131,7 +131,7 @@ async function claimTask(walletAddress, taskId, proxy) {
     const response = await requestWithRetry('post', url, payload, getAxiosConfig(proxy));
     return response.data && response.data.message
       ? response.data.message
-      : 'Task claim berhasil, tetapi tidak ada pesan dari server.';
+      : 'Yêu cầu nhiệm vụ thành công nhưng máy chủ không phản hồi.';
   } catch (error) {
     return `Task ${taskId} gagal: ${error.response?.data?.message || error.message}`;
   }
@@ -142,11 +142,11 @@ async function updateStartTime(walletAddress, proxy) {
   const payload = { wallet: walletAddress, startTime: Date.now() };
   try {
     const response = await requestWithRetry('put', url, payload, getAxiosConfig(proxy));
-    const message = response.data && response.data.message ? response.data.message : 'Start node berhasil';
+    const message = response.data && response.data.message ? response.data.message : 'Khởi động Node thành công';
     const totalPoints =
       response.data && response.data.user && response.data.user.totalPoints !== undefined
         ? response.data.user.totalPoints
-        : 'Tidak diketahui';
+        : 'Lỗi';
     return { message, totalPoints };
   } catch (error) {
     const message = `Start node gagal: ${error.response?.data?.message || error.message}`;
@@ -187,16 +187,16 @@ async function processAccount(account, index, total, proxy) {
     }
   }
 
-  const spinnerStart = ora({ text: 'Starting Node...', spinner: 'dots2', color: 'cyan' }).start();
+  const spinnerStart = ora({ text: 'Đang khởi động Node...', spinner: 'dots2', color: 'cyan' }).start();
   const { message, totalPoints } = await updateStartTime(walletAddress, proxy);
   if (message.toLowerCase().includes('successfully') || message.toLowerCase().includes('berhasil')) {
     spinnerStart.succeed(chalk.greenBright(` Start Node Berhasil : ${message}`));
   } else {
-    spinnerStart.fail(chalk.red(` Start Node Failed : ${message}`));
+    spinnerStart.fail(chalk.red(` Khởi động node Lỗi : ${message}`));
   }
 
-  const spinnerPoints = ora({ text: 'Get Total Points ...', spinner: 'dots2', color: 'cyan' }).start();
-  spinnerPoints.succeed(chalk.greenBright(` Total Points : ${totalPoints}`));
+  const spinnerPoints = ora({ text: 'Tổng Points ...', spinner: 'dots2', color: 'cyan' }).start();
+  spinnerPoints.succeed(chalk.greenBright(` Tổng Points : ${totalPoints}`));
 }
 
 function askQuestion(query) {
@@ -211,7 +211,7 @@ function askQuestion(query) {
 }
 
 async function run() {
-  cfonts.say('NT Exhaust', {
+  cfonts.say('LocalSec', {
     font: 'block',
     align: 'center',
     colors: ['cyan', 'magenta'],
@@ -221,23 +221,23 @@ async function run() {
     space: true,
     maxLength: '0'
   });
-  console.log(centerText("=== Telegram Channel 🚀 : NT Exhaust (@NTExhaust) ===\n"));
+  console.log(centerText("=== Telegram Channel 🚀 : LocalSec ===\n"));
 
-  const useProxyAns = await askQuestion('Ingin menggunakan proxy? (y/n): ');
+  const useProxyAns = await askQuestion('Sử dụng proxy? (y/n): ');
   let proxies = [];
   let useProxy = false;
   if (useProxyAns.trim().toLowerCase() === 'y') {
     useProxy = true;
     proxies = await readProxies();
     if (proxies.length === 0) {
-      console.log(chalk.yellow('Tidak ada proxy di proxy.txt. Lanjut tanpa proxy.'));
+      console.log(chalk.yellow('Không có proxy trong proxy.txt. Tiếp tục mà không cần proxy.'));
       useProxy = false;
     }
   }
 
   const accounts = await readAccounts();
   if (accounts.length === 0) {
-    console.log(chalk.red('Tidak ada akun di accounts.json.'));
+    console.log(chalk.red('Không có tài khoản trong accounts.json.'));
     return;
   }
 
@@ -246,11 +246,11 @@ async function run() {
     try {
       await processAccount(accounts[i], i, accounts.length, proxy);
     } catch (error) {
-      console.error(chalk.red(`Error pada akun ${i + 1}: ${error.message}`));
+      console.error(chalk.red(`Lỗi tài khoản ${i + 1}: ${error.message}`));
     }
   }
 
-  console.log(chalk.magentaBright('Auto Start Node selesai. Menunggu 24 jam sebelum pengulangan...'));
+  console.log(chalk.magentaBright('Khởi động tự động đã hoàn tất. Chờ 24 giờ trước khi lặp lại...'));
   await delay(86400);
   run();
 }

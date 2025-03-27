@@ -162,17 +162,17 @@ async function processAccount(account, index, total, proxy) {
   const { walletAddress, privateKey } = account;
   console.log(`\n`);
   console.log(chalk.bold.cyanBright('='.repeat(80)));
-  console.log(chalk.bold.whiteBright(`Akun: ${index + 1}/${total}`));
+  console.log(chalk.bold.whiteBright(`Tài khoản: ${index + 1}/${total}`));
   console.log(chalk.bold.whiteBright(`Wallet: ${walletAddress}`));
   const usedIP = await getPublicIP(proxy);
-  console.log(chalk.bold.whiteBright(`IP yang DIgunakan : ${usedIP}`));
+  console.log(chalk.bold.whiteBright(`IP đã sử dụng : ${usedIP}`));
   console.log(chalk.bold.cyanBright('='.repeat(80)));
 
   let wallet;
   try {
     wallet = new Wallet(privateKey);
   } catch (error) {
-    console.error(chalk.red(`Error membuat wallet: ${error.message}`));
+    console.error(chalk.red(`Lỗi khi tạo ví: ${error.message}`));
     return;
   }
 
@@ -190,7 +190,7 @@ async function processAccount(account, index, total, proxy) {
   const spinnerStart = ora({ text: 'Đang khởi động Node...', spinner: 'dots2', color: 'cyan' }).start();
   const { message, totalPoints } = await updateStartTime(walletAddress, proxy);
   if (message.toLowerCase().includes('successfully') || message.toLowerCase().includes('berhasil')) {
-    spinnerStart.succeed(chalk.greenBright(` Start Node Berhasil : ${message}`));
+    spinnerStart.succeed(chalk.greenBright(` Bắt đầu Node thành công : ${message}`));
   } else {
     spinnerStart.fail(chalk.red(` Khởi động node Lỗi : ${message}`));
   }
@@ -221,7 +221,7 @@ async function run() {
     space: true,
     maxLength: '0'
   });
-  console.log(centerText("=== Telegram Channel 🚀 : LocalSec ===\n"));
+  console.log(centerText("=== Code và Việt Hóa 🚀 : LocalSec ===\n"));
 
   const useProxyAns = await askQuestion('Sử dụng proxy? (y/n): ');
   let proxies = [];
